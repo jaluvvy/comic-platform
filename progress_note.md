@@ -30,6 +30,8 @@
    - `.env.local` đã cấu hình Supabase credentials
    - Migration SQL + RLS policies đã tạo sẵn trong `web/prisma/migrations/`
    - Seed script đã update: `web/scripts/seed.ts`
+   - Đã thêm `error.tsx` + `loading.tsx` + `dynamic = 'force-dynamic'` cho DB pages
+   - Đã push lên GitHub: `https://github.com/jaluvvy/comic-platform`
 
 5. **Supabase**
    - Project: `sxfoyzrqkeoqfuawdalw`

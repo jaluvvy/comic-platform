@@ -48,15 +48,21 @@
 
 ### Web Platform (Next.js + TypeScript + Tailwind + Supabase + Prisma)
 - Đã setup project trong `web/`
-- **Schema**: Publisher, Comic, Gift, Event, EventGift, User, Listing
+- **Schema**: 7 models (Publisher, Comic, Gift, Event, EventGift, User, Listing)
 - **Pages**: Home (`/`), Comics (`/comics`), Comic detail (`/comics/[id]`)
 - **API**: `/api/comics`, `/api/comics/[id]`
 - **Components**: Header, ComicCard, ComicGrid, SearchBar
-- **Seed script**: `web/scripts/seed.ts` - import comics + gifts từ parsed JSON
-- **Build**: Đã build thành công (`npm run build` passed)
+- **Build**: Đã build thành công (`npm run build` passed) sau khi fix:
+  - Remove DB query từ `not-found.tsx`
+  - Thêm `error.tsx` + `loading.tsx`
+  - Set `dynamic = 'force-dynamic'` cho `comics` + `comics/[id]`
+- **GitHub**: Đã push lên `https://github.com/jaluvvy/comic-platform`
 - **Node.js**: Đã cài portable Node.js 22 LTS tại `C:\Users\Nam.le\AppData\Local\Temp\kilo\nodejs\node-v22.15.0-win-x64`
 - **Setup script**: `setup-node-env.ps1` - setup Node.js PATH + execution policy
 - **Env**: `.env.local` đã cấu hình Supabase credentials
+- **Migration**: `web/prisma/migrations/20240101000000_init/migration.sql` - schema 7 tables + indexes + FKs
+- **RLS**: `web/prisma/migrations/20240101000000_init/rls_policies.sql` - public read, admin write, users manage own
+- **Seed script**: `web/scripts/seed.ts` - import comics + gifts từ parsed JSON
 
 ### Supabase Setup Status
 - **Migration**: `web/prisma/migrations/20240101000000_init/migration.sql` - schema 7 tables + indexes + FKs
