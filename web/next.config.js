@@ -12,20 +12,6 @@ const nextConfig = {
       },
     ],
   },
-  // Production optimizations
-  compress: true,
-  poweredByHeader: false,
-  generateBuildId: async () => {
-    return 'build-' + Date.now();
-  },
-  // Server-side rendering for dynamic content
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
-  },
-  // Output standalone for Docker/Vercel
-  output: 'standalone',
 }
 
 module.exports = nextConfig

@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""
+Setup Supabase Production Project
+This script helps you set up a new Supabase production project
+"""
+import sys
+import json
+from pathlib import Path
+
+sys.stdout.reconfigure(encoding='utf-8')
+
+print("=" * 60)
+print("Supabase Production Project Setup")
+print("=" * 60)
+print()
+
+print("Step 1: Create new Supabase project")
+print("-" * 40)
+print("1. Go to https://supabase.com/dashboard")
+print("2. Click 'New Project'")
+print("3. Fill in:")
+print("   - Name: comic-platform-prod")
+print("   - Database Password: [choose a strong password]")
+print("   - Region: [choose closest to your users]")
+print("4. Click 'Create new project'")
+print("5. Wait for project to be ready (1-2 minutes)")
+print()
+
+print("Step 2: Get connection details")
+print("-" * 40)
+print("After project is created:")
+print("1. Go to Project Settings → Database")
+print("2. Copy 'Connection string' (URI format)")
+print("3. It looks like:")
+print("   postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres")
+print()
+
+print("Step 3: Update Prisma schema for production")
+print("-" * 40)
+print("The schema is already configured. Just run:")
+print("   npm run db:push")
+print()
+
+print("Step 4: Import data from dev")
+print("-" * 40)
+print("Run this command with your production connection string:")
+print()
+print("   python scripts/import_supabase.py \\")
+print("     --url \"postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres\" \\")
+print("     --input supabase_export \\")
+print("     --clear")
+print()
+
+print("Step 5: Configure Auth")
+print("-" * 40)
+print("1. Go to Authentication → Providers → Email")
+print("2. Configure:")
+print("   - Enable Email provider")
+print("   - Set 'Confirm email' to true (recommended)")
+print("   - Configure email templates")
+print("3. Go to Authentication → URL Configuration")
+print("   - Add your production URL to 'Redirect URLs'")
+print("   - Example: https://your-app.vercel.app/**")
+print()
+
+print("Step 6: Get API credentials")
+print("-" * 40)
+print("1. Go to Project Settings → API")
+print("2. Copy:")
+print("   - Project URL → NEXT_PUBLIC_SUPABASE_URL")
+print("   - anon/public key → NEXT_PUBLIC_SUPABASE_ANON_KEY")
+print()
+
+print("Step 7: Deploy to Vercel")
+print("-" * 40)
+print("1. Push code to GitHub")
+print("2. Go to vercel.com/new")
+print("3. Import your repository")
+print("4. Add environment variables:")
+print("   - NEXT_PUBLIC_APP_URL=https://your-app.vercel.app")
+print("   - DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres")
+print("   - NEXT_PUBLIC_SUPABASE_URL=https://[PROJECT-REF].supabase.co")
+print("   - NEXT_PUBLIC_SUPABASE_ANON_KEY=[YOUR-ANON-KEY]")
+print("5. Click Deploy")
+print()
+
+print("=" * 60)
+print("Setup Complete!")
+print("=" * 60)
+print()
+print("Next steps:")
+print("1. Visit your production URL")
+print("2. Register a test user")
+print("3. Verify auth works")
+print("4. Test listings CRUD")
+print()
