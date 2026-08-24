@@ -121,3 +121,15 @@ python scripts/import_supabase.py --url "postgresql://postgres:%40ThanhVy2323%40
 # Review comics
 python scripts/review_comics.py
 ```
+
+## 🎉 Milestones
+
+- [x] Git repo initialized and pushed to GitHub
+- [x] Production Supabase database populated (5321 comics)
+- [x] Web platform build passing
+- [x] Auth system implemented
+- [x] Listings CRUD with filters
+- [x] Admin review page for manga/LN cleanup
+- [ ] Manual review of ~232 flagged items
+- [ ] Deploy to Vercel production
+- [ ] Expand to other publishers
