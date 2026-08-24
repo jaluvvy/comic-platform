@@ -1,0 +1,19 @@
+{
+  "total": 0,
+  "updated_at": "2026-08-19T10:00:00+07:00",
+  "items": [],
+  "notes": "Add FES gifts from Kim Dong fanpage here. Each item should include comic info, event name, date, and gift details.",
+  "schema": {
+    "comic_product_id": "string - product ID from nxbkimdong.com.vn",
+    "comic_title": "string - title of the comic",
+    "event_name": "string - name of the FES/event",
+    "event_date": "string - date of the event (YYYY-MM-DD)",
+    "gift_name": "string - name of the gift",
+    "description": "string or null - description of the gift",
+    "image_url": "string or null - URL to gift image",
+    "condition": "string or null - condition to receive gift (e.g., 'Mua sản phẩm tại FES')",
+    "is_fes": true,
+    "source": "manual or facebook",
+    "source_url": "string or null - URL to fanpage post or event page"
+  }
+}

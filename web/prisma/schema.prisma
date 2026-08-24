@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Publisher {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique @db.VarChar(100)
+  website     String?
+  type        String    @default("nxb") @db.VarChar(20) // 'nxb' | 'phat_hanh'
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  comics      Comic[]
+  events      Event[]
+
+  @@map("publishers")
+}
+
+model Comic {
+  id              String    @id @default(cuid())
+  publisherId     String
+  publisher       Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+
+  title           String    @db.VarChar(500)
+  slug            String    @db.VarChar(500)
+  productId       String?   @unique @map("product_id")
+  sku             String?   @db.VarChar(100)
+  isbn            String?   @db.VarChar(50)
+  
+  price           Int?
+  originalPrice   Int?      @map("original_price")
+  currency        String    @default("VND") @db.VarChar(10)
+  
+  authors         String[] // array of strings
+  targetAudience  String?   @map("target_audience")
+  dimensions      String?
+  pages           Int?
+  format          String?
+  weight          String?
+  
+  editionType     String?   @default("ban_in_dau") @map("edition_type") @db.VarChar(50) // 'ban_in_dau' | 'tai_ban'
+  editionYear     Int?      @map("edition_year")
+  
+  series          String?
+  description     String?   @db.Text
+  coverImage      String?   @map("cover_image")
+  productType     String?   @map("product_type") @db.VarChar(50)
+  url             String?   @unique
+  lastmod         String?
+  
+  gifts           Gift[]
+  eventGifts      EventGift[]
+  listings        Listing[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([publisherId])
+  @@index([slug])
+  @@index([title])
+  @@index([productId])
+  @@map("comics")
+}
+
+model Gift {
+  id          String   @id @default(cuid())
+  comicId     String
+  comic       Comic    @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  
+  name        String   @db.VarChar(200)
+  description String?
+  imageUrl    String?  @map("image_url")
+  isFes       Boolean  @default(false) @map("is_fes")
+  fesEvent    String?  @map("fes_event") @db.VarChar(200)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([comicId])
+  @@map("gifts")
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  publisherId String
+  publisher   Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+  
+  name        String    @db.VarChar(200)
+  eventType   String    @default("hoc_sach") @map("event_type") @db.VarChar(50) // 'hoc_sach' | 'fes' | 'khac'
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  description String?
+  
+  eventGifts  EventGift[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([publisherId])
+  @@map("events")
+}
+
+model EventGift {
+  id          String   @id @default(cuid())
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  comicId     String?
+  comic       Comic?   @relation(fields: [comicId], references: [id], onDelete: SetNull)
+  
+  giftName    String   @map("gift_name") @db.VarChar(200)
+  condition   String?  @db.Text
+  imageUrl    String?  @map("image_url")
+  
+  createdAt   DateTime @default(now())
+
+  @@index([eventId])
+  @@index([comicId])
+  @@map("event_gifts")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  listings      Listing[]
+
+  @@map("users")
+}
+
+model Listing {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  comicId       String
+  comic         Comic     @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  
+  price         Int
+  condition     String    @default("tot") @db.VarChar(50) // 'moi' | 'tot' | 'binh_thuong' | 'cu'
+  editionInfo   String?   @map("edition_info") @db.Text
+  giftsIncluded String[]  @map("gifts_included") // array of gift names
+  intro         String?   @db.Text
+  outro         String?   @db.Text
+  status        String    @default("active") @db.VarChar(20) // 'active' | 'sold' | 'hidden'
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([comicId])
+  @@index([status])
+  @@map("listings")
+}
