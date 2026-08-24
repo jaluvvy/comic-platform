@@ -25,6 +25,10 @@ build/
 supabase_export/
 backups/
 
+# Crawler output
+output/
+data/
+
 # IDE
 .idea/
 .vscode/
