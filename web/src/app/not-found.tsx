@@ -1,8 +1,4 @@
-import prisma from "@/lib/prisma";
-
-export default async function NotFound() {
-  const comicCount = await prisma.comic.count();
-  
+export default function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
