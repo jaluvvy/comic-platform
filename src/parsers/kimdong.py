@@ -200,7 +200,6 @@ class KimDongParser:
             if strong and "Tặng kèm" in strong.get_text():
                 gift_name = strong.get_text(strip=True).replace("Tặng kèm", "").strip()
                 img = None
-                # Look for image in current p or next sibling p
                 next_p = p.find_next_sibling("p")
                 if next_p:
                     img = next_p.find("img")
@@ -216,6 +215,53 @@ class KimDongParser:
                     "is_fes": False,
                     "fes_event": None,
                 })
+
+        volumes = []
+        script_tags = soup.find_all("script")
+        for script in script_tags:
+            script_text = script.get_text()
+            if "variants" in script_text and "product" in script_text:
+                match = re.search(r"product\s*=\s*({.*?});", script_text, re.DOTALL)
+                if match:
+                    try:
+                        product_data = json.loads(match.group(1))
+                        variants = product_data.get("variants", [])
+                        if len(variants) > 1:
+                            for variant in variants:
+                                volume_number = None
+                                volume_label = None
+                                option_title = variant.get("title", "")
+                                m = re.search(r"Tập\s+(\d+)", option_title)
+                                if m:
+                                    volume_number = int(m.group(1))
+                                    volume_label = f"Tập {volume_number:02d}"
+                                elif option_title:
+                                    volume_label = option_title
+
+                                image_url = None
+                                image_data = variant.get("image")
+                                if isinstance(image_data, dict):
+                                    image_url = image_data.get("src")
+
+                                volumes.append({
+                                    "product_id": str(variant.get("id")) if variant.get("id") else None,
+                                    "sku": variant.get("sku"),
+                                    "barcode": variant.get("barcode"),
+                                    "title": option_title or title,
+                                    "slug": f"{slug}-tap-{volume_number:02d}" if volume_number else slug,
+                                    "price": int(variant.get("price", 0)) if variant.get("price") else None,
+                                    "original_price": int(variant.get("compare_at_price", 0)) if variant.get("compare_at_price") else None,
+                                    "volume_number": volume_number,
+                                    "volume_label": volume_label,
+                                    "cover_image": image_url,
+                                    "url": url,
+                                    "available": bool(variant.get("available", True)),
+                                    "inventory_qty": variant.get("inventory_quantity"),
+                                    "gifts": [],
+                                })
+                            break
+                    except json.JSONDecodeError:
+                        continue
 
         return Comic(
             publisher=publisher,
@@ -238,6 +284,7 @@ class KimDongParser:
             product_type=product_type,
             genre=genre,
             gifts=gifts,
+            volumes=volumes,
             url=url,
             lastmod=lastmod,
         )

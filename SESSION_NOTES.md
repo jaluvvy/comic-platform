@@ -149,6 +149,7 @@ npm run dev
 - **Mock data**: `src/lib/mock-data.ts` cho testing local khi không có DB
 - **API updates**: `/api/comics`, `/api/comics/[id]`, `/api/listings` đã update để support volume/gift separation
 - **UI updates**: Comic detail page hiển thị volumes + gifts riêng, listings page support listing type `comic/volume/gift/combo`
+- **Volume extraction from aggregated pages**: Parser `kimdong_v2.py` đã hỗ trợ extract variants từ trang sản phẩm tổng hợp (kiểu Fullmetal Alchemist có 18 tập trong 1 link)
 - **Build**: Passed với schema mới
 - **Git**: Đã push lên `https://github.com/jaluvvy/comic-platform` (branch `master`)
 
