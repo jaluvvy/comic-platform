@@ -7,47 +7,46 @@ Nền tảng thư viện + mua bán truyện tranh Việt Nam.
 
 ### ✅ COMPLETED
 1. **Crawler v2** - Full Kim Đồng sitemap crawl
-    - 5,325/5,326 URLs crawled (99.98%)
-    - Output: `output/parsed/*.json` + `output/raw/*.html`
-    - Gift extraction cleaned, edition detection working
+   - 5,325/5,326 URLs crawled (99.98%)
+   - Output: `output/parsed/*.json` + `output/raw/*.html`
+   - Gift extraction cleaned, edition detection working
 
 2. **Web Platform** - Next.js 14 + TypeScript + Tailwind + Supabase + Prisma
-    - Build passing (`npm run build`)
-    - Code on GitHub: https://github.com/jaluvvy/comic-platform
-    - Branch: `master`
-    - Schema: Comic (bộ) → Volume (tập) → Gift (quà tặng độc lập) + Event/EventGift
-    - Mock data available for local testing: `src/lib/mock-data.ts`
+   - Build passing (`npm run build`)
+   - Code on GitHub: https://github.com/jaluvvy/comic-platform
+   - Branch: `master`
+   - Schema: Comic (bộ) → Volume (tập) → Gift (quà tặng độc lập) + Event/EventGift
+   - Mock data available for local testing: `src/lib/mock-data.ts`
 
 3. **Database** - Production Supabase ready
-    - Project: `sxfoyzrqkeoqfuawdalw.supabase.co`
-    - 1,772 comics after auto-prefilter (from 5,325)
-    - Schema synced with Prisma
-    - Migration + RLS policies ready in `web/prisma/migrations/`
+   - Project: `kfseqrvwvkjbdyywlobp.supabase.co`
+   - 5,321 comics + 1,669 gifts imported
+   - Schema synced with Prisma
+   - Migration + RLS policies ready in `web/prisma/migrations/`
 
 4. **Auth System**
-    - Login/Register with email confirmation
-    - Forgot/Reset password
-    - Middleware protecting routes
-    - Header with user state
+   - Login/Register with email confirmation
+   - Forgot/Reset password
+   - Middleware protecting routes
+   - Header with user state
 
 5. **Selling Module**
-    - /listings - browse with filters (title, condition, price)
-    - /listings/[id] - detail page
-    - /listings/create - create listing (protected)
-    - /listings/manage - user's listings (protected)
-    - API CRUD for listings
+   - /listings - browse with filters (title, condition, price)
+   - /listings/[id] - detail page
+   - /listings/create - create listing (protected)
+   - /listings/manage - user's listings (protected)
+   - API CRUD for listings
 
 6. **Data Quality Tools**
-    - `scripts/review_comics.py` - flags manga/LN
-    - `/admin/review-comics` - protected admin review page
-    - Batch review, manual filter tools
-    - Auto-prefilter: kept 1,772, removed 1,952 comics
+   - `scripts/review_comics.py` - flags manga/LN (219 manga, 13 LN)
+   - `/admin/review-comics` - protected admin review page
+   - Batch review, manual filter tools
 
 7. **GitHub Ready**
-    - Repo: https://github.com/jaluvvy/comic-platform
-    - `.gitignore` configured (`.env.local`, `node_modules`, `.venv`, `output/`, etc.)
-    - Portable Node.js 22 LTS: `C:\Users\Nam.le\AppData\Local\Temp\kilo\nodejs\`
-    - Setup script: `setup-node-env.ps1`
+   - Repo: https://github.com/jaluvvy/comic-platform
+   - `.gitignore` configured (`.env.local`, `node_modules`, `.venv`, `output/`, `data/`, `__pycache__/`)
+   - Setup script: `scripts/setup_new_machine.py/.bat`
+   - Portable Node.js setup: `setup-node-env.ps1`
 
 ### 🔄 IN PROGRESS
 1. **Manual review** - ~1,700 comics need filtering
@@ -156,13 +155,16 @@ python scripts/import_supabase.py --url "postgresql://postgres:[PASSWORD]@db.kfs
 7. Auto-generate Facebook sell templates
 8. Mobile app or PWA
 
-## 🆕 Latest Updates (2026-08-25)
+## 🆕 Latest Updates (2026-08-26)
 - Schema changed: Comic (bộ) → Volume (tập) → Gift (quà tặng độc lập)
 - New migration: `20250101000000_add_volume_and_separate_gifts`
 - Mock data added: `src/lib/mock-data.ts` for local testing without DB
 - Web pages updated: comics, comic detail, listings support new schema
 - API routes updated with DB error fallback to mock data
 - Build passed with new schema
+- Git repo pushed to GitHub: `https://github.com/jaluvvy/comic-platform`
+- Production DB populated: 5,321 comics + 1,669 gifts
+- Project path updated to `H:\My Drive\Work\comic-crawler`
 
 ## 🤖 For Kilo Bot
 When user asks to continue work:
