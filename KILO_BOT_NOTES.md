@@ -14,7 +14,7 @@ Nền tảng thư viện + mua bán truyện tranh Việt Nam.
 2. **Web Platform** - Next.js 14 + TypeScript + Tailwind + Supabase + Prisma
     - Build passing (`npm run build`)
     - Code on GitHub: https://github.com/jaluvvy/comic-platform
-    - Branch: `main`
+    - Branch: `master`
 
 3. **Database** - Production Supabase ready
     - Project: `sxfoyzrqkeoqfuawdalw.supabase.co`
