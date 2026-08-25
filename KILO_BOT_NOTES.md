@@ -57,10 +57,11 @@ Nền tảng thư viện + mua bán truyện tranh Việt Nam.
 2. **Database connection** - Supabase DNS issue on some machines
     - Dev project: `sxfoyzrqkeoqfuawdalw.supabase.co`
     - Production project: `kfseqrvwvkjbdyywlobp.supabase.co`
+    - Current workaround: using mock data fallback in web app
 
 ### ⚠️ BLOCKERS / TODO
 1. **Supabase DNS** - Some machines can't resolve `db.sxfoyzrqkeoqfuawdalw.supabase.co`
-    - Fix: Use direct connection string from dashboard
+    - Fix: Use direct connection string from dashboard or pooled connection
     - Production project ref: `kfseqrvwvkjbdyywlobp`
 
 2. **Production deploy** - Not yet deployed to Vercel
@@ -73,6 +74,11 @@ Nền tảng thư viện + mua bán truyện tranh Việt Nam.
 
 4. **Expand publishers** - Only Kim Đồng crawled
     - Next: Hồng Hạc, IPM, AZ Comics
+
+5. **Volume extraction from aggregated pages**
+    - Some product pages contain multiple volumes in one URL
+    - Need to parse `product.variants[]` to create separate Volume entries
+    - See `output/raw/sample_aggregated.html` for example
 
 ## 🔑 Credentials (DO NOT COMMIT)
 
@@ -149,6 +155,14 @@ python scripts/import_supabase.py --url "postgresql://postgres:[PASSWORD]@db.kfs
 6. Add publisher management page
 7. Auto-generate Facebook sell templates
 8. Mobile app or PWA
+
+## 🆕 Latest Updates (2026-08-25)
+- Schema changed: Comic (bộ) → Volume (tập) → Gift (quà tặng độc lập)
+- New migration: `20250101000000_add_volume_and_separate_gifts`
+- Mock data added: `src/lib/mock-data.ts` for local testing without DB
+- Web pages updated: comics, comic detail, listings support new schema
+- API routes updated with DB error fallback to mock data
+- Build passed with new schema
 
 ## 🤖 For Kilo Bot
 When user asks to continue work:

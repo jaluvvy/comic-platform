@@ -62,5 +62,24 @@
 - Supabase DNS resolve failed → cần connection string mới từ dashboard
 
 ## Cập nhật lần cuối
-- Thời gian: 2026-08-24 11:54 ICT
+- Thời gian: 2026-08-25 15:36 ICT
 - Người cập nhật: Kilo
+
+## Latest Updates (2026-08-25)
+- **New schema**: Comic (bộ) → Volume (tập) → Gift (quà tặng độc lập) + Event/EventGift
+  - `Comic`: bộ truyện chung
+  - `Volume`: từng tập riêng (Tập 01, Tập 02...)
+  - `Gift`: quà tặng độc lập, có thể gắn vào `volumeId` (quà combo) hoặc `eventId` (quà FES/fan meeting)
+  - `Listing`: có thể bán `comic`, `volume`, `gift`, hoặc `combo`
+- **Migration**: `web/prisma/migrations/20250101000000_add_volume_and_separate_gifts/`
+- **Mock data**: `src/lib/mock-data.ts` cho testing local khi không có DB
+- **API updates**: 
+  - `/api/comics` - support fallback to mock data
+  - `/api/comics/[id]` - include volumes + gifts + eventGifts
+  - `/api/listings` - support listing type filter, include volume/gift relations
+- **UI updates**:
+  - Comic detail page hiển thị volumes grid + event gifts section
+  - Listings page support filtering by type (comic/volume/gift/event)
+  - ComicCard hiển thị số tập + số quà
+- **Build**: Passed với schema mới
+- **Git**: Đã push lên `https://github.com/jaluvvy/comic-platform` (branch `master`)

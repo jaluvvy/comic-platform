@@ -139,9 +139,18 @@ npm run dev
 2. **Fix Supabase DNS** → kiểm tra project active → copy connection string mới từ dashboard
 3. **Chạy migrate**: `cd web && npx prisma migrate dev`
 4. **Seed comics**: `cd web && npm run db:seed`
-5. **Chạy web dev server**: `cd web && npm run dev`
+5. **Test web**: `cd web && npm run dev` (đang dùng mock data fallback)
 6. **Crawl thêm NXB khác** (Hồng Hạc, IPM, AZ Comics...)
 7. **Deploy lên Vercel** + connect Supabase
+
+## Latest Updates (2026-08-25)
+- **New schema**: Comic (bộ) → Volume (tập) → Gift (quà tặng độc lập) + Event/EventGift
+- **Migration**: `web/prisma/migrations/20250101000000_add_volume_and_separate_gifts/`
+- **Mock data**: `src/lib/mock-data.ts` cho testing local khi không có DB
+- **API updates**: `/api/comics`, `/api/comics/[id]`, `/api/listings` đã update để support volume/gift separation
+- **UI updates**: Comic detail page hiển thị volumes + gifts riêng, listings page support listing type `comic/volume/gift/combo`
+- **Build**: Passed với schema mới
+- **Git**: Đã push lên `https://github.com/jaluvvy/comic-platform` (branch `master`)
 
 ## Known Issues
 - Publisher field đã fix (fallback cố định)
