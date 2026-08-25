@@ -28,13 +28,21 @@ def get_pending_comics():
     files = [f for f in files if f.name not in ("summary.json", "summary_filtered.json", ".crawled_urls.txt")]
     decisions = load_decisions()
     pending = []
+    skipped = 0
     for f in files:
-        with open(f, "r", encoding="utf-8") as fh:
-            data = json.load(fh)
+        try:
+            with open(f, "r", encoding="utf-8") as fh:
+                data = json.load(fh)
+        except Exception as e:
+            print(f"[batch] Skipping invalid JSON: {f.name} ({e})")
+            skipped += 1
+            continue
         pid = data.get("product_id") or f.stem
         if pid in decisions:
             continue
         pending.append({"file": f, "data": data, "pid": pid})
+    if skipped:
+        print(f"[batch] Skipped {skipped} invalid JSON files")
     return pending
 
 

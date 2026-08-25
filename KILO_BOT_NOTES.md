@@ -15,6 +15,8 @@ Nền tảng thư viện + mua bán truyện tranh Việt Nam.
     - Build passing (`npm run build`)
     - Code on GitHub: https://github.com/jaluvvy/comic-platform
     - Branch: `master`
+    - Schema: Comic (bộ) → Volume (tập) → Gift (quà tặng độc lập) + Event/EventGift
+    - Mock data available for local testing: `src/lib/mock-data.ts`
 
 3. **Database** - Production Supabase ready
     - Project: `sxfoyzrqkeoqfuawdalw.supabase.co`

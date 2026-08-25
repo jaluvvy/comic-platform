@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import { BookOpen, Filter, Search } from "lucide-react";
+import { BookOpen, Filter, Search, Gift } from "lucide-react";
 import ListingFilters from "./ListingFilters";
 
 export const metadata: Metadata = {
   title: "Danh sách bán | ComicPlatform",
-  description: "Xem danh sách truyện tranh đang được bán",
+  description: "Xem danh sách truyện tranh, tập, quà tặng đang được bán",
 };
 
 async function getListings(searchParams: Record<string, string>) {
@@ -18,6 +18,7 @@ async function getListings(searchParams: Record<string, string>) {
     if (searchParams.condition) params.set("condition", searchParams.condition);
     if (searchParams.minPrice) params.set("minPrice", searchParams.minPrice);
     if (searchParams.maxPrice) params.set("maxPrice", searchParams.maxPrice);
+    if (searchParams.type) params.set("type", searchParams.type);
 
     const res = await fetch(`${baseUrl}/api/listings?${params.toString()}`, {
       next: { revalidate: 30 },
@@ -32,6 +33,30 @@ async function getListings(searchParams: Record<string, string>) {
   return { listings: [], pagination: null };
 }
 
+function getListingTitle(listing: any): string {
+  if (listing.volume) return listing.volume.title;
+  if (listing.gift) return listing.gift.name;
+  if (listing.comic) return listing.comic.title;
+  return "Không rõ";
+}
+
+function getListingImage(listing: any): string | null {
+  if (listing.volume?.coverImage) return listing.volume.coverImage;
+  if (listing.gift?.imageUrl) return listing.gift.imageUrl;
+  if (listing.comic?.coverImage) return listing.comic.coverImage;
+  return null;
+}
+
+function getListingTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    comic: "Bộ truyện",
+    volume: "Tập",
+    gift: "Quà tặng",
+    combo: "Combo",
+  };
+  return labels[type] || type;
+}
+
 export default async function ListingsPage({
   searchParams,
 }: {
@@ -40,7 +65,7 @@ export default async function ListingsPage({
   const { listings, pagination } = await getListings(searchParams);
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("vi-VN").format(price) + " VND";
+    return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
   };
 
   const getConditionLabel = (condition: string) => {
@@ -60,7 +85,7 @@ export default async function ListingsPage({
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Danh sách bán</h1>
             <p className="text-gray-600 mt-1">
-              Tìm và mua truyện tranh từ cộng đồng
+              Tìm và mua truyện tranh, tập, quà tặng từ cộng đồng
             </p>
           </div>
           <Link
@@ -108,10 +133,10 @@ export default async function ListingsPage({
                 >
                   <div className="flex items-start justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-                      {listing.comic.title}
+                      {getListingTitle(listing)}
                     </h3>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-                      {getConditionLabel(listing.condition)}
+                      {getListingTypeLabel(listing.listingType)}
                     </span>
                   </div>
 
@@ -123,9 +148,15 @@ export default async function ListingsPage({
                       </span>
                     </p>
                     <p>
-                      <span className="font-medium">NXB:</span>{" "}
-                      {listing.comic.publisher?.name || "N/A"}
+                      <span className="font-medium">Tình trạng:</span>{" "}
+                      {getConditionLabel(listing.condition)}
                     </p>
+                    {listing.comic?.publisher && (
+                      <p>
+                        <span className="font-medium">NXB:</span>{" "}
+                        {listing.comic.publisher.name}
+                      </p>
+                    )}
                     {listing.editionInfo && (
                       <p>
                         <span className="font-medium">Phiên bản:</span>{" "}
@@ -136,6 +167,13 @@ export default async function ListingsPage({
                       <p>
                         <span className="font-medium">Quà tặng:</span>{" "}
                         {listing.giftsIncluded.join(", ")}
+                      </p>
+                    )}
+                    {listing.volume?.gifts && listing.volume.gifts.length > 0 && (
+                      <p className="flex items-center gap-1">
+                        <Gift className="h-4 w-4 text-yellow-500" />
+                        <span className="font-medium">Quà kèm tập:</span>{" "}
+                        {listing.volume.gifts.map((g: any) => g.name).join(", ")}
                       </p>
                     )}
                   </div>

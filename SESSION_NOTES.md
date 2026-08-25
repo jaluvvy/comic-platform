@@ -48,21 +48,19 @@
 
 ### Web Platform (Next.js + TypeScript + Tailwind + Supabase + Prisma)
 - Đã setup project trong `web/`
-- **Schema**: 7 models (Publisher, Comic, Gift, Event, EventGift, User, Listing)
-- **Pages**: Home (`/`), Comics (`/comics`), Comic detail (`/comics/[id]`)
-- **API**: `/api/comics`, `/api/comics/[id]`
-- **Components**: Header, ComicCard, ComicGrid, SearchBar
-- **Build**: Đã build thành công (`npm run build` passed) sau khi fix:
-  - Remove DB query từ `not-found.tsx`
-  - Thêm `error.tsx` + `loading.tsx`
-  - Set `dynamic = 'force-dynamic'` cho `comics` + `comics/[id]`
-- **GitHub**: Đã push lên `https://github.com/jaluvvy/comic-platform`
-- **Node.js**: Đã cài portable Node.js 22 LTS tại `C:\Users\Nam.le\AppData\Local\Temp\kilo\nodejs\node-v22.15.0-win-x64`
+- **Schema mới**: Comic (bộ) → Volume (tập) → Gift (quà tặng độc lập) + Event/EventGift
+- **Pages**: Home (`/`), Comics (`/comics`), Comic detail (`/comics/[id]`), Listings (`/listings`)
+- **API**: `/api/comics`, `/api/comics/[id]`, `/api/listings`
+- **Components**: Header, ComicCard, ComicGrid, SearchBar, ListingFilters
+- **Build**: Đã build thành công (`npm run build` passed)
+- **Mock data**: Đã thêm fallback mock data cho testing khi không có DB (`src/lib/mock-data.ts`)
+- **Node.js**: Portable Node.js 22 LTS tại `C:\Users\Nam.le\AppData\Local\Temp\kilo\nodejs\node-v22.15.0-win-x64`
 - **Setup script**: `setup-node-env.ps1` - setup Node.js PATH + execution policy
 - **Env**: `.env.local` đã cấu hình Supabase credentials
-- **Migration**: `web/prisma/migrations/20240101000000_init/migration.sql` - schema 7 tables + indexes + FKs
-- **RLS**: `web/prisma/migrations/20240101000000_init/rls_policies.sql` - public read, admin write, users manage own
-- **Seed script**: `web/scripts/seed.ts` - import comics + gifts từ parsed JSON
+- **Migration**: `web/prisma/migrations/20240101000000_init/migration.sql` - schema cũ
+- **Migration mới**: `web/prisma/migrations/20250101000000_add_volume_and_separate_gifts/migration.sql` - Comic/Volume/Gift separation
+- **RLS mới**: `web/prisma/migrations/20250101000000_add_volume_and_separate_gifts/rls_policies.sql`
+- **Seed script**: `web/scripts/seed.ts` - import comics + volumes + gifts từ parsed JSON
 
 ### Supabase Setup Status
 - **Migration**: `web/prisma/migrations/20240101000000_init/migration.sql` - schema 7 tables + indexes + FKs

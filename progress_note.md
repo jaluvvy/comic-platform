@@ -32,6 +32,8 @@
    - Seed script đã update: `web/scripts/seed.ts`
    - Đã thêm `error.tsx` + `loading.tsx` + `dynamic = 'force-dynamic'` cho DB pages
    - Đã push lên GitHub: `https://github.com/jaluvvy/comic-platform`
+   - **New schema**: Comic (bộ) → Volume (tập) → Gift (quà tặng độc lập) + Event/EventGift
+   - **Mock data**: `src/lib/mock-data.ts` cho testing local khi không có DB
 
 5. **Supabase**
    - Project: `sxfoyzrqkeoqfuawdalw`
