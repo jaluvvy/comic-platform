@@ -44,7 +44,7 @@ export const mockComics = [
         available: false,
         inventoryQty: 0,
         gifts: [
-          { id: "gift-1", name: "Standee", description: null, imageUrl: null, isFes: false, giftType: "combo", rarity: "normal" }
+          { id: "gift-1", name: "Standee", description: null, imageUrl: null, isFes: false, giftType: "combo", rarity: "normal", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), volumeId: null, eventId: null }
         ],
       },
       {
@@ -141,7 +141,7 @@ export const mockEvents = [
         giftName: "Bộ bookmark Kim Đồng FES 2025",
         condition: "Mua combo bất kỳ trong sự kiện",
         imageUrl: null,
-        gift: { id: "gift-2", name: "Bookmark FES 2025", description: null, imageUrl: null, isFes: true, giftType: "fes", rarity: "limited" }
+        gift: { id: "gift-2", name: "Bookmark FES 2025", description: null, imageUrl: null, isFes: true, giftType: "fes", rarity: "limited", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), volumeId: null, eventId: null }
       }
     ]
   }
@@ -157,6 +157,8 @@ export const mockStandaloneGifts = [
     eventId: "event-1",
     isFes: true,
     giftType: "fes",
-    rarity: "limited"
+    rarity: "limited",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   }
 ];
