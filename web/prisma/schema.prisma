@@ -18,6 +18,7 @@ model Publisher {
 
   volumes         Volume[]
   comics          Comic[]
+  events          Event[]
 
   @@map("publishers")
 }
