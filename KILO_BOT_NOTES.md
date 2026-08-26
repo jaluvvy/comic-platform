@@ -58,7 +58,7 @@ Nền tảng thư viện + mua bán truyện tranh Việt Nam.
     - Pooled connection tested: `pooler.kfseqrvwvkjbdyywlobp.supabase.co:6543` resolves but TCP fails
     - Likely cause: firewall / IP restriction on Supabase project
     - Current workaround: web app uses mock data fallback
-    - **Deployed to Vercel**: https://web-oi3xq4ax9-jaluvvy.vercel.app
+    - **Deployed to Vercel**: https://comic-platform-ch9idp10x-jaluvvy.vercel.app
     - Vercel project: jaluvvy/web
     - Envs configured: DATABASE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
 

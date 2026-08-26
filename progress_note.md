@@ -39,7 +39,7 @@
    - Project: `kfseqrvwvkjbdyywlobp.supabase.co`
    - Pooled connection tested: `pooler.kfseqrvwvkjbdyywlobp.supabase.co:6543`
    - **Local**: TCP connect fails from this machine (firewall/IP restriction likely)
-   - **Vercel**: Deployed successfully to `https://web-oi3xq4ax9-jaluvvy.vercel.app`
+   - **Vercel**: Deployed successfully to `https://comic-platform-ch9idp10x-jaluvvy.vercel.app`
    - Envs: DATABASE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
    - Workaround: web app has mock data fallback if DB unreachable
 

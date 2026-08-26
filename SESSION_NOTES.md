@@ -63,7 +63,7 @@
 - **Seed script**: `web/scripts/seed.ts` - import comics + volumes + gifts từ parsed JSON
 
 ### Supabase Setup Status
-- **Production URL**: https://web-oi3xq4ax9-jaluvvy.vercel.app
+- **Production URL**: https://comic-platform-ch9idp10x-jaluvvy.vercel.app
 - **Vercel project**: jaluvvy/web
 - **Envs added**: DATABASE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
 - **Status**: Deployed to Vercel. Build passed. App is live at production URL.
