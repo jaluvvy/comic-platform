@@ -17,6 +17,7 @@ model Publisher {
   updatedAt   DateTime  @updatedAt
 
   comics      Comic[]
+  volumes     Volume[]
   events      Event[]
 
   @@map("publishers")
@@ -54,8 +55,7 @@ model Comic {
   url             String?   @unique
   lastmod         String?
   
-  gifts           Gift[]
-  eventGifts      EventGift[]
+  volumes         Volume[]
   listings        Listing[]
   
   createdAt       DateTime  @default(now())
@@ -68,21 +68,70 @@ model Comic {
   @@map("comics")
 }
 
-model Gift {
-  id          String   @id @default(cuid())
-  comicId     String
-  comic       Comic    @relation(fields: [comicId], references: [id], onDelete: Cascade)
+model Volume {
+  id              String    @id @default(cuid())
+  comicId         String
+  comic           Comic     @relation(fields: [comicId], references: [id], onDelete: Cascade)
+
+  title           String    @db.VarChar(500)
+  slug            String    @db.VarChar(500)
+  productId       String?   @unique @map("product_id")
+  sku             String?   @db.VarChar(100)
+  barcode         String?   @db.VarChar(100)
   
-  name        String   @db.VarChar(200)
-  description String?
-  imageUrl    String?  @map("image_url")
-  isFes       Boolean  @default(false) @map("is_fes")
-  fesEvent    String?  @map("fes_event") @db.VarChar(200)
+  price           Int?
+  originalPrice   Int?      @map("original_price")
+  currency        String    @default("VND") @db.VarChar(10)
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  volumeNumber    Int?      @map("volume_number")
+  volumeLabel     String?   @map("volume_label") @db.VarChar(50) // 'Tập 1', 'Tập 2', 'Vol.1', etc.
+  
+  pages           Int?
+  format          String?
+  dimensions      String?
+  weight          String?
+  
+  coverImage      String?   @map("cover_image")
+  url             String?   @unique
+  
+  available       Boolean   @default(true)
+  inventoryQty    Int?      @default(null) @map("inventory_qty")
+  
+  gifts           Gift[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@index([comicId])
+  @@index([slug])
+  @@index([productId])
+  @@map("volumes")
+}
+
+model Gift {
+  id          String    @id @default(cuid())
+  
+  name        String    @db.VarChar(200)
+  description String?
+  imageUrl    String?   @map("image_url")
+  
+  // Standalone gift: can attach to volume or event
+  volumeId    String?   @map("volume_id")
+  volume      Volume?   @relation(fields: [volumeId], references: [id], onDelete: SetNull)
+  
+  eventId     String?   @map("event_id")
+  event       Event?    @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  
+  // Gift metadata
+  isFes       Boolean   @default(false) @map("is_fes")
+  giftType    String?   @default("combo") @map("gift_type") @db.VarChar(50) // 'combo' | 'fes' | 'fan_meeting' | 'mini_game' | 'standalone'
+  rarity      String?   @default("normal") @db.VarChar(50) // 'normal' | 'rare' | 'limited'
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([volumeId])
+  @@index([eventId])
   @@map("gifts")
 }
 
@@ -92,7 +141,7 @@ model Event {
   publisher   Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
   
   name        String    @db.VarChar(200)
-  eventType   String    @default("hoc_sach") @map("event_type") @db.VarChar(50) // 'hoc_sach' | 'fes' | 'khac'
+  eventType   String    @default("hoc_sach") @map("event_type") @db.VarChar(50) // 'hoc_sach' | 'fes' | 'fan_meeting' | 'mini_game' | 'khac'
   startDate   DateTime? @map("start_date")
   endDate     DateTime? @map("end_date")
   description String?
@@ -111,8 +160,11 @@ model EventGift {
   eventId     String
   event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   
-  comicId     String?
-  comic       Comic?   @relation(fields: [comicId], references: [id], onDelete: SetNull)
+  volumeId    String?
+  volume      Volume?  @relation(fields: [volumeId], references: [id], onDelete: SetNull)
+  
+  giftId      String?
+  gift        Gift?    @relation(fields: [giftId], references: [id], onDelete: SetNull)
   
   giftName    String   @map("gift_name") @db.VarChar(200)
   condition   String?  @db.Text
@@ -121,7 +173,8 @@ model EventGift {
   createdAt   DateTime @default(now())
 
   @@index([eventId])
-  @@index([comicId])
+  @@index([volumeId])
+  @@index([giftId])
   @@map("event_gifts")
 }
 
@@ -130,6 +183,7 @@ model User {
   email         String?   @unique
   name          String?
   image         String?
+  role          String?   @default("user") @db.VarChar(20) // 'user' | 'seller' | 'admin'
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -143,8 +197,18 @@ model Listing {
   userId        String
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  comicId       String
-  comic         Comic     @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  // What is being sold: comic series, specific volume, or standalone gift
+  comicId       String?
+  comic         Comic?    @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  
+  volumeId      String?
+  volume        Volume?   @relation(fields: [volumeId], references: [id], onDelete: Cascade)
+  
+  giftId        String?
+  gift          Gift?     @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  
+  // Listing type: 'comic' | 'volume' | 'gift' | 'combo'
+  listingType   String    @default("volume") @map("listing_type") @db.VarChar(20)
   
   price         Int
   condition     String    @default("tot") @db.VarChar(50) // 'moi' | 'tot' | 'binh_thuong' | 'cu'
@@ -159,6 +223,8 @@ model Listing {
 
   @@index([userId])
   @@index([comicId])
+  @@index([volumeId])
+  @@index([giftId])
   @@index([status])
   @@map("listings")
 }
