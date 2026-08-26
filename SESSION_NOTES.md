@@ -9,7 +9,42 @@
 
 ## Current Progress
 
-### Crawler v2 - Full Sitemap Coverage
+### Vercel Deployment
+- **Production URL**: https://comic-platform-ch9idp10x-jaluvvy.vercel.app
+- **Vercel project**: `jaluvvy/web`
+- **Root Directory**: `web`
+- **Status**: Build thành công, site đang chạy ở production
+- **Build config**: `postinstall: prisma generate` để tự động generate Prisma client mỗi deploy
+- **Supabase envs**: `DATABASE_URL` (secret), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (public)
+
+### Manual Filter - COMPLETED
+- **Tổng comics**: 5,524
+- **Đã review**: 5,524 (100%)
+- **Keep**: 4,968
+- **Remove**: 556
+- **Auto-filter script**: `src/utils/auto_filter.py` đã được tạo và chạy thành công
+- **Decisions file**: `output/manual_filter_decisions.json` đã được merge đầy đủ
+- **Tool cũ**: `src/utils/batch_review.py` (đã review 600 comics thủ công trước đó)
+
+### Web Platform Status
+- **Schema Prisma**: Đã ổn định với model Comic → Volume → Gift + Event/EventGift + Listing
+- **Build Vercel**: Passed
+- **Mock fallback**: Đã thêm cho `/comics`, `/comics/[id]`, `/api/comics`, `/api/comics/[id]`
+- **Mock data**: `web/src/lib/mock-data.ts` chứa 2 comics mẫu
+- **API hoạt động**: `/api/listings` có mock fallback, `/api/comics` có mock fallback
+
+### Known Issues
+- TypeScript type mismatch trong `comics/[id]/page.tsx` line 199: `Gift` type từ Prisma khác với mock data
+- Supabase DB connection vẫn chưa kết nối được từ local machine
+- Web đang chạy mock data vì DB chưa connect được
+
+## Next Steps
+1. **Fix TypeScript type mismatch** trong `comics/[id]/page.tsx` - align mock `Gift` type với Prisma schema
+2. **Fix Supabase connection** - kiểm tra project active, connection string, firewall/IP whitelist
+3. **Chạy migrate** trên Supabase production: `cd web && npx prisma migrate dev`
+4. **Seed comics** vào DB: `cd web && npm run db:seed`
+5. **Verify web** hiển thị dữ liệu thật từ DB
+6. **Crawl thêm NXB khác** (Hồng Hạc, IPM, AZ Comics...)
 - **Đã crawl toàn bộ sitemap Kim Đồng**: **5,325 / 5,326 URLs** (99.98%)
 - **Crawler file**: `src/crawlers/kimdong_v2.py`
 - **Output**: `output/parsed/*.json` (5,325 files) + `output/raw/*.html` (5,325 files)
