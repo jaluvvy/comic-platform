@@ -11,8 +11,12 @@ export async function GET(
     where: { id },
     include: {
       publisher: true,
-      gifts: {
-        orderBy: { createdAt: "desc" },
+      volumes: {
+        include: {
+          gifts: {
+            orderBy: { createdAt: "desc" },
+          },
+        },
       },
       eventGifts: {
         include: {
