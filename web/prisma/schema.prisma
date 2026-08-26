@@ -95,7 +95,7 @@ model Volume {
   url             String?   @unique
   
   available       Boolean   @default(true)
-  inventoryQty    Int?      @default(null) @map("inventory_qty")
+  inventoryQty    Int?      @map("inventory_qty")
   
   gifts           Gift[]
   
