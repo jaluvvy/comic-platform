@@ -56,7 +56,6 @@ model Comic {
   lastmod         String?
   
   volumes         Volume[]
-  eventGifts      EventGift[]
   listings        Listing[]
   
   createdAt       DateTime  @default(now())

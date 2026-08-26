@@ -18,11 +18,6 @@ export async function GET(
           },
         },
       },
-      eventGifts: {
-        include: {
-          event: true,
-        },
-      },
     },
   });
 
