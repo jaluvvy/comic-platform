@@ -147,9 +147,9 @@ export default async function ComicDetailPage({ params }: ComicDetailPageProps) 
                       <div className="flex">
                         <dt className="w-24 text-gray-500">Phiên bản:</dt>
                         <dd className="text-gray-900">
-                          {comic.editionType === "tai_ban" 
-                            ? `Tái bản ${comic.editionYear ? `(${comic.editionYear})` : ""}`
-                            : "Bản in đầu"}
+                           {comic.editionType === "tai_ban" 
+                             ? `Tái bản ${(comic as any).editionYear ? `(${(comic as any).editionYear})` : ""}`
+                             : "Bản in đầu"}
                         </dd>
                       </div>
                     )}
