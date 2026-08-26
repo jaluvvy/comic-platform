@@ -19,11 +19,10 @@ interface Comic {
     name: string;
     slug: string;
   };
-  gifts: {
-    id: string;
-    name: string;
-    imageUrl: string | null;
-    isFes: boolean;
+  volumes: {
+    gifts: {
+      id: string;
+    }[];
   }[];
 }
 
@@ -53,7 +52,7 @@ export function ComicCard({ comic }: ComicCardProps) {
               <Package className="h-12 w-12 text-gray-400" />
             </div>
           )}
-          {comic.gifts.length > 0 && (
+          {comic.volumes.some(v => v.gifts.length > 0) && (
             <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">
               Quà tặng
             </div>

@@ -25,7 +25,11 @@ async function getComics(searchParams: { q?: string; publisher?: string; genre?:
     where,
     include: {
       publisher: true,
-      gifts: true,
+      volumes: {
+        include: {
+          gifts: true,
+        },
+      },
     },
     orderBy: { updatedAt: "desc" },
     take: 50,

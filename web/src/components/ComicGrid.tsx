@@ -17,11 +17,10 @@ interface Comic {
     name: string;
     slug: string;
   };
-  gifts: {
-    id: string;
-    name: string;
-    imageUrl: string | null;
-    isFes: boolean;
+  volumes: {
+    gifts: {
+      id: string;
+    }[];
   }[];
 }
 

@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
-import type { Gift } from "@prisma/client";
 import { MapPin, Calendar, Package, Tag, ExternalLink } from "lucide-react";
 
 interface ComicDetailPageProps {
@@ -13,8 +12,12 @@ async function getComic(id: string) {
     where: { id },
     include: {
       publisher: true,
-      gifts: {
-        orderBy: { createdAt: "desc" },
+      volumes: {
+        include: {
+          gifts: {
+            orderBy: { createdAt: "desc" },
+          },
+        },
       },
     },
   });
@@ -180,14 +183,14 @@ export default async function ComicDetailPage({ params }: ComicDetailPageProps) 
               )}
 
               {/* Gifts Section */}
-              {comic.gifts.length > 0 && (
+              {comic.volumes.some(v => v.gifts.length > 0) && (
                 <div className="mb-6">
                   <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                     <Tag className="h-5 w-5 text-yellow-500" />
                     Quà tặng kèm
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {comic.gifts.map((gift: Gift) => (
+                    {comic.volumes.flatMap(v => v.gifts).map((gift) => (
                       <div key={gift.id} className="border rounded-lg p-3 bg-gray-50">
                         {gift.imageUrl && (
                           <div className="relative aspect-square bg-white rounded mb-2 overflow-hidden">
