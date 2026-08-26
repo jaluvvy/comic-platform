@@ -1,6 +1,7 @@
 import { ComicGrid } from "@/components/ComicGrid";
 import { SearchBar } from "@/components/SearchBar";
 import prisma from "@/lib/prisma";
+import { mockComics } from "@/lib/mock-data";
 
 interface ComicsPageProps {
   searchParams: Promise<{ q?: string; publisher?: string; genre?: string }>;
@@ -21,19 +22,33 @@ async function getComics(searchParams: { q?: string; publisher?: string; genre?:
     where.publisher = { slug: searchParams.publisher };
   }
 
-  return prisma.comic.findMany({
-    where,
-    include: {
-      publisher: true,
-      volumes: {
-        include: {
-          gifts: true,
+  try {
+    return await prisma.comic.findMany({
+      where,
+      include: {
+        publisher: true,
+        volumes: {
+          include: {
+            gifts: true,
+          },
         },
       },
-    },
-    orderBy: { updatedAt: "desc" },
-    take: 50,
-  });
+      orderBy: { updatedAt: "desc" },
+      take: 50,
+    });
+  } catch (error) {
+    console.error("Database error, falling back to mock comics:", error);
+    let data = mockComics;
+    if (searchParams.q) {
+      const qLower = searchParams.q.toLowerCase();
+      data = data.filter(c => 
+        c.title.toLowerCase().includes(qLower) ||
+        c.series?.toLowerCase().includes(qLower) ||
+        c.authors.some(a => a.toLowerCase().includes(qLower))
+      );
+    }
+    return data;
+  }
 }
 
 async function getPublishers() {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { mockComics } from "@/lib/mock-data";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -22,35 +23,53 @@ export async function GET(request: Request) {
     where.publisher = { slug: publisher };
   }
 
-  const [comics, total] = await Promise.all([
-    prisma.comic.findMany({
-      where,
-      include: {
-        publisher: {
-          select: { id: true, name: true, slug: true },
-        },
-        volumes: {
-          include: {
-            gifts: {
-              select: { id: true, name: true, imageUrl: true, isFes: true },
+  try {
+    const [comics, total] = await Promise.all([
+      prisma.comic.findMany({
+        where,
+        include: {
+          publisher: {
+            select: { id: true, name: true, slug: true },
+          },
+          volumes: {
+            include: {
+              gifts: {
+                select: { id: true, name: true, imageUrl: true, isFes: true },
+              },
             },
           },
         },
-      },
-      orderBy: { updatedAt: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
-    }),
-    prisma.comic.count({ where }),
-  ]);
+        orderBy: { updatedAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.comic.count({ where }),
+    ]);
 
-  return NextResponse.json({
-    data: comics,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-  });
+    return NextResponse.json({
+      data: comics,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Database error, falling back to mock comics:", error);
+    let data = mockComics;
+    if (q) {
+      const qLower = q.toLowerCase();
+      data = data.filter(c => 
+        c.title.toLowerCase().includes(qLower) ||
+        c.series?.toLowerCase().includes(qLower) ||
+        c.authors.some(a => a.toLowerCase().includes(qLower))
+      );
+    }
+    return NextResponse.json({
+      data,
+      pagination: { page, limit, total: data.length, totalPages: 1 },
+      mock: true,
+    });
+  }
 }

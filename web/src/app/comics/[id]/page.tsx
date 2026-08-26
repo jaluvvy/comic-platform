@@ -2,28 +2,34 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { MapPin, Calendar, Package, Tag, ExternalLink } from "lucide-react";
+import { mockComics } from "@/lib/mock-data";
 
 interface ComicDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
 async function getComic(id: string) {
-  const comic = await prisma.comic.findUnique({
-    where: { id },
-    include: {
-      publisher: true,
-      volumes: {
-        include: {
-          gifts: {
-            orderBy: { createdAt: "desc" },
+  try {
+    const comic = await prisma.comic.findUnique({
+      where: { id },
+      include: {
+        publisher: true,
+        volumes: {
+          include: {
+            gifts: {
+              orderBy: { createdAt: "desc" },
+            },
           },
         },
       },
-    },
-  });
-  
-  if (!comic) return null;
-  return comic;
+    });
+    
+    if (!comic) return null;
+    return comic;
+  } catch (error) {
+    console.error("Database error, falling back to mock comic:", error);
+    return mockComics.find(c => c.id === id) || null;
+  }
 }
 
 export async function generateMetadata({ params }: ComicDetailPageProps) {
