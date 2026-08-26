@@ -39,15 +39,7 @@ export async function POST(request: Request) {
     }
 
     if (decision === "remove") {
-      // Delete the comic and its related data
-      await prisma.gift.deleteMany({
-        where: { comicId }
-      });
-      
-      await prisma.eventGift.deleteMany({
-        where: { comicId }
-      });
-      
+      // Delete related listings and comic
       await prisma.listing.deleteMany({
         where: { comicId }
       });
