@@ -16,9 +16,8 @@ model Publisher {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  comics      Comic[]
-  volumes     Volume[]
-  events      Event[]
+  volumes         Volume[]
+  comics          Comic[]
 
   @@map("publishers")
 }
@@ -73,6 +72,9 @@ model Volume {
   comicId         String
   comic           Comic     @relation(fields: [comicId], references: [id], onDelete: Cascade)
 
+  publisherId     String
+  publisher       Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+
   title           String    @db.VarChar(500)
   slug            String    @db.VarChar(500)
   productId       String?   @unique @map("product_id")
@@ -98,11 +100,14 @@ model Volume {
   inventoryQty    Int?      @map("inventory_qty")
   
   gifts           Gift[]
+  eventGifts      EventGift[]
+  listings        Listing[]
   
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
   @@index([comicId])
+  @@index([publisherId])
   @@index([slug])
   @@index([productId])
   @@map("volumes")
@@ -130,6 +135,9 @@ model Gift {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  eventGifts  EventGift[]
+  listings    Listing[]
+
   @@index([volumeId])
   @@index([eventId])
   @@map("gifts")
@@ -146,6 +154,7 @@ model Event {
   endDate     DateTime? @map("end_date")
   description String?
   
+  gifts       Gift[]
   eventGifts  EventGift[]
   
   createdAt   DateTime  @default(now())
