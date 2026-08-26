@@ -41,3 +41,6 @@ next-env.d.ts
 # Cache
 .cache/
 .parcel-cache/
+
+.vercel
+.env*

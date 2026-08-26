@@ -35,12 +35,13 @@
    - **New schema**: Comic (bộ) → Volume (tập) → Gift (quà tặng độc lập) + Event/EventGift
    - **Mock data**: `src/lib/mock-data.ts` cho testing local khi không có DB
 
-5. **Supabase**
+5. **Supabase / Vercel**
    - Project: `kfseqrvwvkjbdyywlobp.supabase.co`
    - Pooled connection tested: `pooler.kfseqrvwvkjbdyywlobp.supabase.co:6543`
-   - **BLOCKER**: Can't reach database server (TCP connect failed, likely firewall/IP restriction)
-   - Workaround: web app uses mock data fallback
-   - Options: check Supabase IP allowlist, create new project, deploy to Vercel, or use local DB
+   - **Local**: TCP connect fails from this machine (firewall/IP restriction likely)
+   - **Vercel**: Deployed successfully to `https://web-oi3xq4ax9-jaluvvy.vercel.app`
+   - Envs: DATABASE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+   - Workaround: web app has mock data fallback if DB unreachable
 
 ## Công cụ đã tạo
 - `src/utils/batch_review.py` - review 10 comics/lần

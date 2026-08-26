@@ -58,11 +58,9 @@ Nền tảng thư viện + mua bán truyện tranh Việt Nam.
     - Pooled connection tested: `pooler.kfseqrvwvkjbdyywlobp.supabase.co:6543` resolves but TCP fails
     - Likely cause: firewall / IP restriction on Supabase project
     - Current workaround: web app uses mock data fallback
-    - Options:
-      A. Check Supabase project IP allowlist / firewall settings
-      B. Create new Supabase project with different network config
-      C. Deploy to Vercel (bypass local network restrictions)
-      D. Use SQLite / local DB for development
+    - **Deployed to Vercel**: https://web-oi3xq4ax9-jaluvvy.vercel.app
+    - Vercel project: jaluvvy/web
+    - Envs configured: DATABASE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 ### ⚠️ BLOCKERS / TODO
 1. **Supabase DNS** - Some machines can't resolve `db.sxfoyzrqkeoqfuawdalw.supabase.co`

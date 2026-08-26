@@ -63,14 +63,11 @@
 - **Seed script**: `web/scripts/seed.ts` - import comics + volumes + gifts từ parsed JSON
 
 ### Supabase Setup Status
-- **Project**: `kfseqrvwvkjbdyywlobp.supabase.co`
-- **Credentials**:
-  - DATABASE_URL (pooled): `postgresql://postgres:%40ThanhVy2323%40@pooler.kfseqrvwvkjbdyywlobp.supabase.co:6543/postgres?pgbouncer=true`
-  - NEXT_PUBLIC_SUPABASE_URL: `https://kfseqrvwvkjbdyywlobp.supabase.co`
-- **BLOCKER**: Can't reach database server at `pooler.kfseqrvwvkjbdyywlobp.supabase.co:6543` from this machine
-  - DNS resolves but TCP connect fails (likely firewall/IP restriction)
-  - Web app currently uses mock data fallback
-- **Cần làm**: Kiểm tra firewall mạng, hoặc tạo Supabase project mới, hoặc deploy lên Vercel (không bị chặn)
+- **Production URL**: https://web-oi3xq4ax9-jaluvvy.vercel.app
+- **Vercel project**: jaluvvy/web
+- **Envs added**: DATABASE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+- **Status**: Deployed to Vercel. Build passed. App is live at production URL.
+- **Note**: Supabase TCP connect still fails from this machine, but Vercel deployment can connect if Supabase allows Vercel IPs.
 
 ### Commands
 ```bash
