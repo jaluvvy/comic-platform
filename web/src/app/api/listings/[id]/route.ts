@@ -18,11 +18,23 @@ export async function GET(
           publisher: {
             select: { id: true, name: true, slug: true },
           },
+        },
+      },
+      volume: {
+        include: {
+          comic: {
+            include: {
+              publisher: {
+                select: { id: true, name: true, slug: true },
+              },
+            },
+          },
           gifts: {
             select: { id: true, name: true, imageUrl: true, isFes: true },
           },
         },
       },
+      gift: true,
     },
   });
 

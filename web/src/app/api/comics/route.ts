@@ -29,8 +29,12 @@ export async function GET(request: Request) {
         publisher: {
           select: { id: true, name: true, slug: true },
         },
-        gifts: {
-          select: { id: true, name: true, imageUrl: true, isFes: true },
+        volumes: {
+          include: {
+            gifts: {
+              select: { id: true, name: true, imageUrl: true, isFes: true },
+            },
+          },
         },
       },
       orderBy: { updatedAt: "desc" },

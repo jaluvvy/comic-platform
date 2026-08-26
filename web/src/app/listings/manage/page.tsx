@@ -13,9 +13,15 @@ type Listing = {
   condition: string;
   status: string;
   createdAt: string;
-  comic: {
+  comic?: {
     title: string;
     coverImage?: string;
+  };
+  volume?: {
+    title: string;
+  };
+  gift?: {
+    name: string;
   };
 };
 
@@ -186,9 +192,9 @@ export default function ManageListingsPage() {
                             </div>
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900 line-clamp-1">
-                              {listing.comic.title}
-                            </div>
+                          <div className="text-sm font-medium text-gray-900 line-clamp-1">
+                            {listing.comic?.title || listing.volume?.title || listing.gift?.name || "Không rõ"}
+                          </div>
                           </div>
                         </div>
                       </td>

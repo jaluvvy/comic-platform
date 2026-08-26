@@ -81,11 +81,13 @@ export default async function ListingDetailPage({
             <div className="flex items-start justify-between mb-6">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                  {listing.comic.title}
+                  {listing.volume?.title || listing.gift?.name || listing.comic?.title || "Không rõ"}
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  {listing.comic.publisher?.name} •{" "}
-                  {listing.comic.authors?.join(", ")}
+                  {(listing.volume?.comic?.publisher?.name || listing.comic?.publisher?.name || "Ẩn danh")}{" "}
+                  {(listing.volume?.comic?.authors?.length || listing.comic?.authors?.length) ? (
+                    <>• {(listing.volume?.comic?.authors || listing.comic?.authors || []).join(", ")}</>
+                  ) : null}
                 </p>
               </div>
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
