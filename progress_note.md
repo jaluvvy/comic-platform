@@ -36,10 +36,11 @@
    - **Mock data**: `src/lib/mock-data.ts` cho testing local khi không có DB
 
 5. **Supabase**
-   - Project: `sxfoyzrqkeoqfuawdalw`
-   - `.env.local` đã có đầy đủ: `DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - **BLOCKER**: DNS resolve failed cho `db.sxfoyzrqkeoqfuawdalw.supabase.co`
-   - Chưa chạy được migrate/seed do không connect được DB
+   - Project: `kfseqrvwvkjbdyywlobp.supabase.co`
+   - Pooled connection tested: `pooler.kfseqrvwvkjbdyywlobp.supabase.co:6543`
+   - **BLOCKER**: Can't reach database server (TCP connect failed, likely firewall/IP restriction)
+   - Workaround: web app uses mock data fallback
+   - Options: check Supabase IP allowlist, create new project, deploy to Vercel, or use local DB
 
 ## Công cụ đã tạo
 - `src/utils/batch_review.py` - review 10 comics/lần

@@ -63,14 +63,14 @@
 - **Seed script**: `web/scripts/seed.ts` - import comics + volumes + gifts từ parsed JSON
 
 ### Supabase Setup Status
-- **Migration**: `web/prisma/migrations/20240101000000_init/migration.sql` - schema 7 tables + indexes + FKs
-- **RLS**: `web/prisma/migrations/20240101000000_init/rls_policies.sql` - public read, admin write, users manage own
-- **Credentials đã có**:
-  - DATABASE_URL: `postgresql://postgres:ThanhVy2323%40@db.sxfoyzrqkeoqfuawdalw.supabase.co:5432/postgres`
-  - NEXT_PUBLIC_SUPABASE_URL: `https://sxfoyzrqkeoqfuawdalw.supabase.co`
-  - NEXT_PUBLIC_SUPABASE_ANON_KEY: `sb_publishable_ZUIOLrpmyQSph4F2SYLJfg_uMRAjKjV`
-- **BLOCKER**: DNS resolve failed cho `db.sxfoyzrqkeoqfuawdalw.supabase.co` → không connect được database
-- **Cần làm**: Kiểm tra lại project Supabase có đang active không, copy connection string mới từ dashboard
+- **Project**: `kfseqrvwvkjbdyywlobp.supabase.co`
+- **Credentials**:
+  - DATABASE_URL (pooled): `postgresql://postgres:%40ThanhVy2323%40@pooler.kfseqrvwvkjbdyywlobp.supabase.co:6543/postgres?pgbouncer=true`
+  - NEXT_PUBLIC_SUPABASE_URL: `https://kfseqrvwvkjbdyywlobp.supabase.co`
+- **BLOCKER**: Can't reach database server at `pooler.kfseqrvwvkjbdyywlobp.supabase.co:6543` from this machine
+  - DNS resolves but TCP connect fails (likely firewall/IP restriction)
+  - Web app currently uses mock data fallback
+- **Cần làm**: Kiểm tra firewall mạng, hoặc tạo Supabase project mới, hoặc deploy lên Vercel (không bị chặn)
 
 ### Commands
 ```bash

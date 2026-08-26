@@ -53,10 +53,16 @@ Nền tảng thư viện + mua bán truyện tranh Việt Nam.
     - Tool: `python -m src.utils.batch_review`
     - Viewer: `output/viewer.html`
 
-2. **Database connection** - Supabase DNS issue on some machines
-    - Dev project: `sxfoyzrqkeoqfuawdalw.supabase.co`
+2. **Database connection** - Supabase connection failing from this machine
     - Production project: `kfseqrvwvkjbdyywlobp.supabase.co`
-    - Current workaround: using mock data fallback in web app
+    - Pooled connection tested: `pooler.kfseqrvwvkjbdyywlobp.supabase.co:6543` resolves but TCP fails
+    - Likely cause: firewall / IP restriction on Supabase project
+    - Current workaround: web app uses mock data fallback
+    - Options:
+      A. Check Supabase project IP allowlist / firewall settings
+      B. Create new Supabase project with different network config
+      C. Deploy to Vercel (bypass local network restrictions)
+      D. Use SQLite / local DB for development
 
 ### ⚠️ BLOCKERS / TODO
 1. **Supabase DNS** - Some machines can't resolve `db.sxfoyzrqkeoqfuawdalw.supabase.co`
