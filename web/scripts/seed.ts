@@ -4,6 +4,35 @@ import { join } from 'path';
 
 const prisma = new PrismaClient();
 
+interface VolumeJson {
+  title: string;
+  slug: string;
+  product_id?: string;
+  sku?: string;
+  barcode?: string;
+  price?: number;
+  original_price?: number;
+  volume_number?: number;
+  volume_label?: string;
+  pages?: number;
+  format?: string;
+  dimensions?: string;
+  weight?: string;
+  cover_image?: string;
+  url?: string;
+  available?: boolean;
+  inventory_qty?: number;
+  gifts?: Array<{
+    name: string;
+    description?: string | null;
+    image_url?: string | null;
+    is_fes?: boolean;
+    fes_event?: string | null;
+    gift_type?: string;
+    rarity?: string;
+  }>;
+}
+
 interface ComicJson {
   publisher: string;
   title: string;
@@ -27,12 +56,15 @@ interface ComicJson {
   lastmod?: string;
   edition_type?: string;
   edition_year?: number;
+  volumes?: VolumeJson[];
   gifts?: Array<{
     name: string;
     description?: string | null;
     image_url?: string | null;
     is_fes?: boolean;
     fes_event?: string | null;
+    gift_type?: string;
+    rarity?: string;
   }>;
 }
 
@@ -45,6 +77,7 @@ async function main() {
 
   let publishersMap = new Map<string, string>();
   let importedComics = 0;
+  let importedVolumes = 0;
   let importedGifts = 0;
 
   for (const file of files) {
@@ -126,30 +159,82 @@ async function main() {
 
     importedComics += 1;
 
-    if (data.gifts && data.gifts.length > 0) {
-      await prisma.gift.deleteMany({
-        where: { comicId: comic.id },
+    const volumes = data.volumes || [];
+    for (const volume of volumes) {
+      const createdVolume = await prisma.volume.upsert({
+        where: { productId: volume.product_id || undefined },
+        update: {
+          title: volume.title,
+          slug: volume.slug,
+          price: volume.price || 0,
+          originalPrice: volume.original_price || null,
+          sku: volume.sku,
+          barcode: volume.barcode,
+          volumeNumber: volume.volume_number,
+          volumeLabel: volume.volume_label,
+          pages: volume.pages,
+          format: volume.format,
+          dimensions: volume.dimensions,
+          weight: volume.weight,
+          coverImage: volume.cover_image,
+          url: volume.url,
+          available: volume.available ?? true,
+          inventoryQty: volume.inventory_qty || null,
+          updatedAt: new Date(),
+        },
+        create: {
+          comicId: comic.id,
+          publisherId,
+          title: volume.title,
+          slug: volume.slug,
+          productId: volume.product_id,
+          price: volume.price || 0,
+          originalPrice: volume.original_price || null,
+          sku: volume.sku,
+          barcode: volume.barcode,
+          volumeNumber: volume.volume_number,
+          volumeLabel: volume.volume_label,
+          pages: volume.pages,
+          format: volume.format,
+          dimensions: volume.dimensions,
+          weight: volume.weight,
+          coverImage: volume.cover_image,
+          url: volume.url,
+          available: volume.available ?? true,
+          inventoryQty: volume.inventory_qty || null,
+        },
       });
 
-      for (const gift of data.gifts) {
-        await prisma.gift.create({
-          data: {
-            comicId: comic.id,
-            name: gift.name,
-            description: gift.description || null,
-            imageUrl: gift.image_url || null,
-            isFes: gift.is_fes || false,
-            fesEvent: gift.fes_event || null,
-          },
+      importedVolumes += 1;
+
+      const gifts = volume.gifts || [];
+      if (gifts.length > 0) {
+        await prisma.gift.deleteMany({
+          where: { volumeId: createdVolume.id },
         });
-        importedGifts += 1;
+
+        for (const gift of gifts) {
+          await prisma.gift.create({
+            data: {
+              volumeId: createdVolume.id,
+              name: gift.name,
+              description: gift.description || null,
+              imageUrl: gift.image_url || null,
+              isFes: gift.is_fes || false,
+              fesEvent: gift.fes_event || null,
+              giftType: gift.gift_type || 'combo',
+              rarity: gift.rarity || 'normal',
+            },
+          });
+          importedGifts += 1;
+        }
       }
     }
 
-    console.log(`Imported: ${data.title} (+${data.gifts?.length || 0} gifts)`);
+    console.log(`Imported: ${data.title} (+${volumes.length} volumes, +${importedGifts} gifts)`);
   }
 
-  console.log(`\nDone! Imported ${importedComics} comics and ${importedGifts} gifts.`);
+  console.log(`\nDone! Imported ${importedComics} comics, ${importedVolumes} volumes, ${importedGifts} gifts.`);
 }
 
 main()

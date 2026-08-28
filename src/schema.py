@@ -20,6 +20,8 @@ class Comic(BaseModel):
     pages: Optional[int] = None
     format: Optional[str] = None
     weight: Optional[str] = None
+    edition_type: Optional[str] = None
+    edition_year: Optional[int] = None
     series: Optional[str] = None
     genre: Optional[str] = None
     description: Optional[str] = None
