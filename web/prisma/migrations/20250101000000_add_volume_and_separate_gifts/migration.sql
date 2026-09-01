@@ -1,0 +1,3 @@
+-- Baseline migration for existing Supabase database
+-- This marks the current schema state as already applied.
+-- Future migrations will be created with `prisma migrate dev`

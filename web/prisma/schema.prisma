@@ -8,134 +8,127 @@ datasource db {
 }
 
 model Publisher {
-  id          String    @id @default(cuid())
+  id          String    @id @default(dbgenerated("gen_random_uuid()"))
   name        String    @unique
   slug        String    @unique @db.VarChar(100)
   website     String?
-  type        String    @default("nxb") @db.VarChar(20) // 'nxb' | 'phat_hanh'
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  type        String    @default("nxb") @db.VarChar(20)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  volumes         Volume[]
-  comics          Comic[]
-  events          Event[]
+  comics      Comic[]
+  events      Event[]
+  volumes     Volume[]
 
   @@map("publishers")
 }
 
 model Comic {
-  id              String    @id @default(cuid())
-  publisherId     String
-  publisher       Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+  id            String    @id @default(dbgenerated("gen_random_uuid()"))
+  publisherId   String    @map("publisher_id")
+  publisher     Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
 
-  title           String    @db.VarChar(500)
-  slug            String    @db.VarChar(500)
-  productId       String?   @unique @map("product_id")
-  sku             String?   @db.VarChar(100)
-  isbn            String?   @db.VarChar(50)
-  
-  price           Int?
-  originalPrice   Int?      @map("original_price")
-  currency        String    @default("VND") @db.VarChar(10)
-  
-  authors         String[] // array of strings
-  targetAudience  String?   @map("target_audience")
-  dimensions      String?
-  pages           Int?
-  format          String?
-  weight          String?
-  
-  editionType     String?   @default("ban_in_dau") @map("edition_type") @db.VarChar(50) // 'ban_in_dau' | 'tai_ban'
-  editionYear     Int?      @map("edition_year")
-  
-  series          String?
-  description     String?   @db.Text
-  coverImage      String?   @map("cover_image")
-  productType     String?   @map("product_type") @db.VarChar(50)
-  url             String?   @unique
-  lastmod         String?
-  
-  volumes         Volume[]
-  listings        Listing[]
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  title         String    @db.VarChar(500)
+  slug          String    @unique(map: "comics_slug_unique_idx") @db.VarChar(500)
+  productId     String?   @unique @map("product_id")
+  sku           String?   @db.VarChar(100)
+  isbn          String?   @db.VarChar(50)
 
-  @@index([publisherId])
+  price         Int?
+  originalPrice Int?      @map("original_price")
+  currency      String    @default("VND") @db.VarChar(10)
+
+  authors       String[]
+  targetAudience String?  @map("target_audience")
+  dimensions    String?
+  pages         Int?
+  format        String?
+  weight        String?
+
+  editionType   String?   @default("ban_in_dau") @map("edition_type") @db.VarChar(50)
+  editionYear   Int?      @map("edition_year")
+
+  series        String?
+  description   String?
+  coverImage    String?   @map("cover_image")
+  productType   String?   @map("product_type") @db.VarChar(50)
+  url           String?   @unique
+  lastmod       String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  eventGifts    EventGift[]
+  listings      Listing[]
+  volumes       Volume[]
+
   @@index([slug])
   @@index([title])
   @@index([productId])
+  @@index([publisherId])
   @@map("comics")
 }
 
 model Volume {
-  id              String    @id @default(cuid())
-  comicId         String
-  comic           Comic     @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  id            String    @id @default(dbgenerated("gen_random_uuid()"))
+  comicId       String    @map("comic_id")
+  comic         Comic     @relation(fields: [comicId], references: [id], onDelete: Cascade)
 
-  publisherId     String
-  publisher       Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+  publisherId   String?   @map("publisher_id")
+  publisher     Publisher? @relation(fields: [publisherId], references: [id], onDelete: Cascade)
 
-  title           String    @db.VarChar(500)
-  slug            String    @db.VarChar(500)
-  productId       String?   @unique @map("product_id")
-  sku             String?   @db.VarChar(100)
-  barcode         String?   @db.VarChar(100)
-  
-  price           Int?
-  originalPrice   Int?      @map("original_price")
-  currency        String    @default("VND") @db.VarChar(10)
-  
-  volumeNumber    Int?      @map("volume_number")
-  volumeLabel     String?   @map("volume_label") @db.VarChar(50) // 'Tập 1', 'Tập 2', 'Vol.1', etc.
-  
-  pages           Int?
-  format          String?
-  dimensions      String?
-  weight          String?
-  
-  coverImage      String?   @map("cover_image")
-  url             String?   @unique
-  
-  available       Boolean   @default(true)
-  inventoryQty    Int?      @map("inventory_qty")
-  
-  gifts           Gift[]
-  eventGifts      EventGift[]
-  listings        Listing[]
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  title         String    @db.VarChar(500)
+  slug          String    @db.VarChar(500)
+  productId     String?   @unique @map("product_id")
+  sku           String?   @db.VarChar(100)
+  barcode       String?   @db.VarChar(100)
 
-  @@index([comicId])
-  @@index([publisherId])
+  price         Int?
+  originalPrice Int?      @map("original_price")
+  currency      String    @default("VND") @db.VarChar(10)
+
+  volumeNumber  Int?      @map("volume_number")
+  volumeLabel   String?   @map("volume_label") @db.VarChar(50)
+
+  pages         Int?
+  format        String?   @db.VarChar(50)
+  dimensions    String?   @db.VarChar(50)
+  weight        String?   @db.VarChar(50)
+
+  coverImage    String?   @map("cover_image")
+  url           String?   @unique
+
+  available     Boolean   @default(true)
+  inventoryQty  Int?      @map("inventory_qty")
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @map("updated_at")
+
+  eventGifts    EventGift[]
+  gifts         Gift[]
+  listings      Listing[]
+
   @@index([slug])
   @@index([productId])
+  @@index([comicId])
+  @@index([publisherId])
   @@map("volumes")
 }
 
 model Gift {
-  id          String    @id @default(cuid())
-  
+  id          String    @id @default(dbgenerated("gen_random_uuid()"))
   name        String    @db.VarChar(200)
   description String?
   imageUrl    String?   @map("image_url")
-  
-  // Standalone gift: can attach to volume or event
+  isFes       Boolean   @default(false) @map("is_fes")
+  fesEvent    String?   @map("fes_event") @db.VarChar(200)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
   volumeId    String?   @map("volume_id")
   volume      Volume?   @relation(fields: [volumeId], references: [id], onDelete: SetNull)
-  
   eventId     String?   @map("event_id")
   event       Event?    @relation(fields: [eventId], references: [id], onDelete: SetNull)
-  
-  // Gift metadata
-  isFes       Boolean   @default(false) @map("is_fes")
-  giftType    String?   @default("combo") @map("gift_type") @db.VarChar(50) // 'combo' | 'fes' | 'fan_meeting' | 'mini_game' | 'standalone'
-  rarity      String?   @default("normal") @db.VarChar(50) // 'normal' | 'rare' | 'limited'
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
+  giftType    String    @default("combo") @map("gift_type") @db.VarChar(50)
+  rarity      String    @default("normal") @db.VarChar(50)
   eventGifts  EventGift[]
   listings    Listing[]
 
@@ -145,91 +138,83 @@ model Gift {
 }
 
 model Event {
-  id          String    @id @default(cuid())
-  publisherId String
-  publisher   Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
-  
-  name        String    @db.VarChar(200)
-  eventType   String    @default("hoc_sach") @map("event_type") @db.VarChar(50) // 'hoc_sach' | 'fes' | 'fan_meeting' | 'mini_game' | 'khac'
-  startDate   DateTime? @map("start_date")
-  endDate     DateTime? @map("end_date")
-  description String?
-  
-  gifts       Gift[]
-  eventGifts  EventGift[]
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           String    @id @default(dbgenerated("gen_random_uuid()"))
+  publisherId  String    @map("publisher_id")
+  publisher    Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+
+  name         String    @db.VarChar(200)
+  eventType    String    @default("hoc_sach") @map("event_type") @db.VarChar(50)
+  startDate    DateTime? @map("start_date")
+  endDate      DateTime? @map("end_date")
+  description  String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  eventGifts   EventGift[]
+  gifts        Gift[]
 
   @@index([publisherId])
   @@map("events")
 }
 
 model EventGift {
-  id          String   @id @default(cuid())
-  eventId     String
-  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  
-  volumeId    String?
-  volume      Volume?  @relation(fields: [volumeId], references: [id], onDelete: SetNull)
-  
-  giftId      String?
-  gift        Gift?    @relation(fields: [giftId], references: [id], onDelete: SetNull)
-  
-  giftName    String   @map("gift_name") @db.VarChar(200)
-  condition   String?  @db.Text
-  imageUrl    String?  @map("image_url")
-  
-  createdAt   DateTime @default(now())
+  id         String    @id @default(dbgenerated("gen_random_uuid()"))
+  eventId    String
+  comicId    String?   @map("comic_id")
+  giftName   String    @map("gift_name") @db.VarChar(200)
+  condition  String?
+  imageUrl   String?   @map("image_url")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  volumeId   String?   @map("volume_id")
+  giftId     String?   @map("gift_id")
+  comic      Comic?    @relation(fields: [comicId], references: [id])
+  event      Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  gift       Gift?     @relation(fields: [giftId], references: [id])
+  volume     Volume?   @relation(fields: [volumeId], references: [id], onDelete: SetNull)
 
   @@index([eventId])
-  @@index([volumeId])
+  @@index([comicId])
   @@index([giftId])
+  @@index([volumeId])
   @@map("event_gifts")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String?   @unique
-  name          String?
-  image         String?
-  role          String?   @default("user") @db.VarChar(20) // 'user' | 'seller' | 'admin'
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  listings      Listing[]
+  id         String    @id @default(dbgenerated("gen_random_uuid()"))
+  email      String?   @unique
+  name       String?
+  image      String?
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  listings   Listing[]
 
   @@map("users")
 }
 
 model Listing {
-  id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // What is being sold: comic series, specific volume, or standalone gift
-  comicId       String?
-  comic         Comic?    @relation(fields: [comicId], references: [id], onDelete: Cascade)
-  
-  volumeId      String?
-  volume        Volume?   @relation(fields: [volumeId], references: [id], onDelete: Cascade)
-  
-  giftId        String?
-  gift          Gift?     @relation(fields: [giftId], references: [id], onDelete: Cascade)
-  
-  // Listing type: 'comic' | 'volume' | 'gift' | 'combo'
-  listingType   String    @default("volume") @map("listing_type") @db.VarChar(20)
-  
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  comicId       String   @map("comic_id")
+  comic         Comic    @relation(fields: [comicId], references: [id], onDelete: Cascade)
+
+  volumeId      String?  @map("volume_id")
+  volume        Volume?  @relation(fields: [volumeId], references: [id], onDelete: Cascade)
+
+  giftId        String?  @map("gift_id")
+  gift          Gift?    @relation(fields: [giftId], references: [id], onDelete: Cascade)
+
+  listingType   String   @default("volume") @map("listing_type") @db.VarChar(20)
   price         Int
-  condition     String    @default("tot") @db.VarChar(50) // 'moi' | 'tot' | 'binh_thuong' | 'cu'
-  editionInfo   String?   @map("edition_info") @db.Text
-  giftsIncluded String[]  @map("gifts_included") // array of gift names
-  intro         String?   @db.Text
-  outro         String?   @db.Text
-  status        String    @default("active") @db.VarChar(20) // 'active' | 'sold' | 'hidden'
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  condition     String   @default("tot") @db.VarChar(50)
+  editionInfo   String?  @map("edition_info")
+  giftsIncluded String[] @map("gifts_included")
+  intro         String?
+  outro         String?
+  status        String   @default("active") @db.VarChar(20)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   @@index([userId])
   @@index([comicId])

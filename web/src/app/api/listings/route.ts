@@ -89,34 +89,8 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Database error, falling back to mock listings:", error);
-    const mockListings = [
-      {
-        id: "listing-1",
-        userId: "user-1",
-        comicId: "comic-1",
-        comic: { id: "comic-1", title: "(Tập lẻ) Fullmetal Alchemist - Cang giả kim thuật sư", publisher: { id: "pub-1", name: "NXB Kim Đồng", slug: "nxb-kim-dong" } },
-        volumeId: "vol-2",
-        volume: { id: "vol-2", title: "Tập 02", price: 67500, coverImage: "https://bizweb.dktcdn.net/100/576/749/products/1c12b69f-c446-41d1-9635-e1a30e2abaed.jpg", available: true, gifts: [] },
-        giftId: null,
-        gift: null,
-        listingType: "volume",
-        price: 65000,
-        condition: "tot",
-        editionInfo: null,
-        giftsIncluded: [],
-        intro: "Sách còn mới, không trầy xước",
-        outro: null,
-        status: "active",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-    ];
-    return NextResponse.json({
-      data: mockListings,
-      pagination: { page, limit, total: 1, totalPages: 1 },
-      mock: true,
-    });
+    console.error("Database error fetching listings:", error);
+    return NextResponse.json({ error: "Failed to fetch listings" }, { status: 500 });
   }
 }
 
