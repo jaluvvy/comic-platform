@@ -1,46 +1,44 @@
 import { ComicGrid } from "@/components/ComicGrid";
 import { SearchBar } from "@/components/SearchBar";
-import prisma from "@/lib/prisma";
 
 interface ComicsPageProps {
   searchParams: Promise<{ q?: string; publisher?: string; genre?: string }>;
 }
 
 async function getComics(searchParams: { q?: string; publisher?: string; genre?: string }) {
-  const where: any = {};
-  
-  if (searchParams.q) {
-    where.OR = [
-      { title: { contains: searchParams.q, mode: "insensitive" } },
-      { authors: { has: searchParams.q } },
-      { series: { contains: searchParams.q, mode: "insensitive" } },
-    ];
-  }
-  
-  if (searchParams.publisher) {
-    where.publisher = { slug: searchParams.publisher };
-  }
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const params = new URLSearchParams();
+    if (searchParams.q) params.set("q", searchParams.q);
+    if (searchParams.publisher) params.set("publisher", searchParams.publisher);
 
-  return await prisma.comic.findMany({
-    where,
-    include: {
-      publisher: true,
-      volumes: {
-        include: {
-          gifts: true,
-        },
-      },
-    },
-    orderBy: { updatedAt: "desc" },
-    take: 50,
-  });
+    const res = await fetch(`${baseUrl}/api/comics?${params.toString()}`, {
+      next: { revalidate: 30 },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.data || [];
+    }
+  } catch (e) {
+    console.error("Failed to fetch comics:", e);
+  }
+  return [];
 }
 
 async function getPublishers() {
-  return prisma.publisher.findMany({
-    select: { id: true, name: true, slug: true },
-    orderBy: { name: "asc" },
-  });
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/publishers`, {
+      next: { revalidate: 60 },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.data || [];
+    }
+  } catch (e) {
+    console.error("Failed to fetch publishers:", e);
+  }
+  return [];
 }
 
 export const dynamic = "force-dynamic";

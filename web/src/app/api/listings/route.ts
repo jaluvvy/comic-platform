@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { supabaseListings } from "@/lib/supabase-helpers";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -89,8 +90,16 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Database error fetching listings:", error);
-    return NextResponse.json({ error: "Failed to fetch listings" }, { status: 500 });
+    console.error("Prisma error, falling back to Supabase REST:", error);
+    try {
+      const result = await supabaseListings({
+        q: q || undefined, condition: condition || undefined, minPrice: minPrice || undefined, maxPrice: maxPrice || undefined, type: type || undefined, status, userId: userId || undefined, page, limit
+      });
+      return NextResponse.json(result);
+    } catch (supabaseError) {
+      console.error("Supabase REST error:", supabaseError);
+      return NextResponse.json({ error: "Failed to fetch listings" }, { status: 500 });
+    }
   }
 }
 

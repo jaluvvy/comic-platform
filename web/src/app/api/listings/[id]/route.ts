@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { supabaseListing } from "@/lib/supabase-helpers";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -7,42 +8,56 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const listing = await prisma.listing.findUnique({
-    where: { id },
-    include: {
-      user: {
-        select: { id: true, name: true, email: true },
-      },
-      comic: {
-        include: {
-          publisher: {
-            select: { id: true, name: true, slug: true },
-          },
+  try {
+    const listing = await prisma.listing.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
         },
-      },
-      volume: {
-        include: {
-          comic: {
-            include: {
-              publisher: {
-                select: { id: true, name: true, slug: true },
-              },
+        comic: {
+          include: {
+            publisher: {
+              select: { id: true, name: true, slug: true },
             },
           },
-          gifts: {
-            select: { id: true, name: true, imageUrl: true, isFes: true },
+        },
+        volume: {
+          include: {
+            comic: {
+              include: {
+                publisher: {
+                  select: { id: true, name: true, slug: true },
+                },
+              },
+            },
+            gifts: {
+              select: { id: true, name: true, imageUrl: true, isFes: true },
+            },
           },
         },
+        gift: true,
       },
-      gift: true,
-    },
-  });
+    });
 
-  if (!listing) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!listing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ data: listing });
+  } catch (error) {
+    console.error("Prisma error, falling back to Supabase REST:", error);
+    try {
+      const listing = await supabaseListing(id);
+      if (!listing) {
+        return NextResponse.json({ error: "Not found" }, { status: 404 });
+      }
+      return NextResponse.json({ data: listing });
+    } catch (supabaseError) {
+      console.error("Supabase REST error:", supabaseError);
+      return NextResponse.json({ error: "Failed to fetch listing" }, { status: 500 });
+    }
   }
-
-  return NextResponse.json({ data: listing });
 }
 
 export async function DELETE(

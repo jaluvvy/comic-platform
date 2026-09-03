@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { supabaseComics } from "@/lib/supabase-helpers";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -22,35 +23,46 @@ export async function GET(request: Request) {
     where.publisher = { slug: publisher };
   }
 
-  const [comics, total] = await Promise.all([
-    prisma.comic.findMany({
-      where,
-      include: {
-        publisher: {
-          select: { id: true, name: true, slug: true },
-        },
-        volumes: {
-          include: {
-            gifts: {
-              select: { id: true, name: true, imageUrl: true, isFes: true },
+  try {
+    const [comics, total] = await Promise.all([
+      prisma.comic.findMany({
+        where,
+        include: {
+          publisher: {
+            select: { id: true, name: true, slug: true },
+          },
+          volumes: {
+            include: {
+              gifts: {
+                select: { id: true, name: true, imageUrl: true, isFes: true },
+              },
             },
           },
         },
-      },
-      orderBy: { updatedAt: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
-    }),
-    prisma.comic.count({ where }),
-  ]);
+        orderBy: { updatedAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.comic.count({ where }),
+    ]);
 
-  return NextResponse.json({
-    data: comics,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-  });
+    return NextResponse.json({
+      data: comics,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Prisma error, falling back to Supabase REST:", error);
+    try {
+      const result = await supabaseComics({ q: q || undefined, publisher: publisher || undefined, page, limit });
+      return NextResponse.json(result);
+    } catch (supabaseError) {
+      console.error("Supabase REST error:", supabaseError);
+      return NextResponse.json({ error: "Failed to fetch comics" }, { status: 500 });
+    }
+  }
 }
