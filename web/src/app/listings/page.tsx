@@ -25,12 +25,13 @@ async function getListings(searchParams: Record<string, string>) {
     });
     if (res.ok) {
       const data = await res.json();
-      return { listings: data.data || [], pagination: data.pagination };
+      return { listings: data.data || [], pagination: data.pagination, error: null as string | null };
     }
-  } catch (e) {
-    console.error("Failed to fetch listings:", e);
+    const text = await res.text();
+    return { listings: [], pagination: null, error: `Failed to fetch listings (${res.status}): ${text}` };
+  } catch (e: any) {
+    return { listings: [], pagination: null, error: e?.message || "Failed to fetch listings" };
   }
-  return { listings: [], pagination: null };
 }
 
 function getListingTitle(listing: any): string {
@@ -64,7 +65,7 @@ export default async function ListingsPage({
 }: {
   searchParams: Record<string, string>;
 }) {
-  const { listings, pagination } = await getListings(searchParams);
+  const { listings, pagination, error } = await getListings(searchParams);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
@@ -101,7 +102,13 @@ export default async function ListingsPage({
 
         <ListingFilters />
 
-        {listings.length === 0 ? (
+        {error && (
+          <div className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-800">
+            {error}
+          </div>
+        )}
+
+        {listings.length === 0 && !error ? (
           <div className="text-center py-16 bg-white rounded-lg border">
             <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-4 text-lg font-semibold text-gray-900">

@@ -28,9 +28,9 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ user: data.user });
-  } catch (e) {
+  } catch (e: any) {
     return NextResponse.json(
-      { error: "Đăng ký thất bại" },
+      { error: e?.message || "Đăng ký thất bại" },
       { status: 500 }
     );
   }

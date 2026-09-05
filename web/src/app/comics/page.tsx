@@ -17,12 +17,13 @@ async function getComics(searchParams: { q?: string; publisher?: string; genre?:
     });
     if (res.ok) {
       const data = await res.json();
-      return data.data || [];
+      return { comics: data.data || [], error: null as string | null };
     }
-  } catch (e) {
-    console.error("Failed to fetch comics:", e);
+    const text = await res.text();
+    return { comics: [] as any[], error: `Failed to fetch comics (${res.status}): ${text}` };
+  } catch (e: any) {
+    return { comics: [] as any[], error: e?.message || "Failed to fetch comics" };
   }
-  return [];
 }
 
 async function getPublishers() {
@@ -45,10 +46,12 @@ export const dynamic = "force-dynamic";
 
 export default async function ComicsPage({ searchParams }: ComicsPageProps) {
   const params = await searchParams;
-  const [comics, publishers] = await Promise.all([
+  const [result, publishers] = await Promise.all([
     getComics(params),
     getPublishers(),
   ]);
+  const comics = result.comics;
+  const error = result.error;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -63,6 +66,12 @@ export default async function ComicsPage({ searchParams }: ComicsPageProps) {
         <div className="mb-6">
           <SearchBar publishers={publishers} />
         </div>
+
+        {error && (
+          <div className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-800">
+            {error}
+          </div>
+        )}
 
         <ComicGrid comics={comics} />
       </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, Search, ShoppingCart } from "lucide-react";
+import { BookOpen, Search, ShoppingCart, Shield } from "lucide-react";
 
 export default function Header() {
   return (
@@ -24,6 +24,13 @@ export default function Header() {
           >
             <ShoppingCart className="h-4 w-4" />
             <span>Mua bán</span>
+          </Link>
+          <Link 
+            href="/admin/review-comics" 
+            className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors"
+          >
+            <Shield className="h-4 w-4" />
+            <span>Review</span>
           </Link>
         </nav>
       </div>
