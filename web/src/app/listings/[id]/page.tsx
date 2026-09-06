@@ -1,42 +1,54 @@
-import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, ArrowLeft, ShoppingCart, User, Tag, Gift, FileText } from "lucide-react";
+import prisma from "@/lib/prisma";
+import { supabaseListing } from "@/lib/supabase-helpers";
 
-export const metadata: Metadata = {
+export const metadata: {
+  title: string;
+} = {
   title: "Chi tiết bài bán | ComicPlatform",
 };
 
 async function getListing(id: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/listings/${id}`, {
-      next: { revalidate: 30 },
+    const listing = await prisma.listing.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+        comic: {
+          include: {
+            publisher: {
+              select: { id: true, name: true, slug: true },
+            },
+          },
+        },
+        volume: {
+          include: {
+            comic: {
+              include: {
+                publisher: {
+                  select: { id: true, name: true, slug: true },
+                },
+              },
+            },
+            gifts: {
+              select: { id: true, name: true, imageUrl: true, isFes: true },
+            },
+          },
+        },
+        gift: true,
+      },
     });
-    if (res.ok) {
-      const data = await res.json();
-      return data.data;
-    }
-  } catch (e) {
-    console.error("Failed to fetch listing:", e);
-  }
-  return null;
-}
 
-async function getComics() {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/comics?limit=100`, {
-      next: { revalidate: 60 },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      return data.data || [];
-    }
-  } catch (e) {
-    console.error("Failed to fetch comics:", e);
+    if (!listing) return null;
+    return listing;
+  } catch (error) {
+    console.error("Prisma error, falling back to Supabase REST:", error);
+    return await supabaseListing(id);
   }
-  return [];
 }
 
 export default async function ListingDetailPage({

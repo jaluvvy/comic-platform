@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { BookOpen, Filter, Search, Gift } from "lucide-react";
 import ListingFilters from "./ListingFilters";
+import prisma from "@/lib/prisma";
+import { supabaseListings } from "@/lib/supabase-helpers";
 
 export const metadata: Metadata = {
   title: "Danh sách bán | ComicPlatform",
@@ -9,28 +11,88 @@ export const metadata: Metadata = {
 };
 
 async function getListings(searchParams: Record<string, string>) {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const params = new URLSearchParams();
-    
-    params.set("limit", "20");
-    if (searchParams.q) params.set("q", searchParams.q);
-    if (searchParams.condition) params.set("condition", searchParams.condition);
-    if (searchParams.minPrice) params.set("minPrice", searchParams.minPrice);
-    if (searchParams.maxPrice) params.set("maxPrice", searchParams.maxPrice);
-    if (searchParams.type) params.set("type", searchParams.type);
+  const status = searchParams.status || "active";
+  const where: any = { status };
 
-    const res = await fetch(`${baseUrl}/api/listings?${params.toString()}`, {
-      next: { revalidate: 30 },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      return { listings: data.data || [], pagination: data.pagination, error: null as string | null };
+  if (searchParams.q) {
+    where.OR = [
+      { comic: { title: { contains: searchParams.q, mode: "insensitive" } } },
+      { volume: { title: { contains: searchParams.q, mode: "insensitive" } } },
+      { gift: { name: { contains: searchParams.q, mode: "insensitive" } } },
+    ];
+  }
+
+  if (searchParams.condition) {
+    where.condition = searchParams.condition;
+  }
+
+  if (searchParams.type) {
+    where.listingType = searchParams.type;
+  }
+
+  if (searchParams.minPrice) {
+    where.price = { ...where.price, gte: parseInt(searchParams.minPrice) };
+  }
+
+  if (searchParams.maxPrice) {
+    where.price = { ...where.price, lte: parseInt(searchParams.maxPrice) };
+  }
+
+  try {
+    const [listings, total] = await Promise.all([
+      prisma.listing.findMany({
+        where,
+        include: {
+          user: {
+            select: { id: true, name: true, email: true },
+          },
+          comic: {
+            include: {
+              publisher: {
+                select: { id: true, name: true, slug: true },
+              },
+            },
+          },
+          volume: {
+            include: {
+              comic: {
+                include: {
+                  publisher: {
+                    select: { id: true, name: true, slug: true },
+                  },
+                },
+              },
+              gifts: true,
+            },
+          },
+          gift: true,
+        },
+        orderBy: { createdAt: "desc" },
+        skip: 0,
+        take: 20,
+      }),
+      prisma.listing.count({ where }),
+    ]);
+
+    return { listings, pagination: { page: 1, limit: 20, total, totalPages: Math.ceil(total / 20) }, error: null as string | null };
+  } catch (error) {
+    console.error("Prisma error, falling back to Supabase REST:", error);
+    try {
+      const result = await supabaseListings({
+        q: searchParams.q || undefined,
+        condition: searchParams.condition || undefined,
+        minPrice: searchParams.minPrice || undefined,
+        maxPrice: searchParams.maxPrice || undefined,
+        type: searchParams.type || undefined,
+        status,
+        page: 1,
+        limit: 20,
+      });
+      return { listings: result.data || [], pagination: result.pagination, error: null as string | null };
+    } catch (supabaseError: any) {
+      console.error("Supabase REST error:", supabaseError);
+      return { listings: [], pagination: null, error: supabaseError?.message || "Failed to fetch listings" };
     }
-    const text = await res.text();
-    return { listings: [], pagination: null, error: `Failed to fetch listings (${res.status}): ${text}` };
-  } catch (e: any) {
-    return { listings: [], pagination: null, error: e?.message || "Failed to fetch listings" };
   }
 }
 

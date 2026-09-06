@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { MapPin, Calendar, Package, Tag, ExternalLink } from "lucide-react";
+import prisma from "@/lib/prisma";
+import { supabaseComic } from "@/lib/supabase-helpers";
 
 interface ComicDetailPageProps {
   params: Promise<{ id: string }>;
@@ -8,18 +10,26 @@ interface ComicDetailPageProps {
 
 async function getComic(id: string): Promise<any> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/comics/${id}`, {
-      next: { revalidate: 30 },
+    const comic = await prisma.comic.findUnique({
+      where: { id },
+      include: {
+        publisher: true,
+        volumes: {
+          include: {
+            gifts: {
+              orderBy: { createdAt: "desc" },
+            },
+          },
+        },
+      },
     });
-    if (res.ok) {
-      const data = await res.json();
-      return data.data;
-    }
-  } catch (e) {
-    console.error("Failed to fetch comic:", e);
+    
+    if (!comic) return null;
+    return comic;
+  } catch (error) {
+    console.error("Prisma error, falling back to Supabase REST:", error);
+    return await supabaseComic(id);
   }
-  return null;
 }
 
 export async function generateMetadata({ params }: ComicDetailPageProps) {
